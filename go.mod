@@ -1,0 +1,10 @@
+module github.com/syahrizalfauzi/jomock
+
+go 1.27.1
+
+require (
+	github.com/bufbuild/protocompile v0.14.1
+	google.golang.org/protobuf v1.36.12
+)
+
+require golang.org/x/sync v0.8.0 // indirect

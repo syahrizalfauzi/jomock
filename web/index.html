@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jomock</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <h1>jomock</h1>
+  <span id="health" class="muted">connecting...</span>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Stubs</h2>
+      <div class="row tight">
+        <button id="new-stub">+ New</button>
+        <button id="open-stubs" class="ghost">Open</button>
+        <button id="save-stubs" class="ghost">Save</button>
+        <input id="open-file" type="file" accept=".json,application/json" hidden>
+      </div>
+    </div>
+
+    <table id="stub-table">
+      <thead>
+        <tr><th>#</th><th>Type</th><th>Method</th><th>Path</th><th>Status</th><th>ID</th><th></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p id="stub-empty" class="muted empty">No stubs yet. Hit "+ New", or Open a stubs.json.</p>
+
+    <form id="editor" class="editor hidden" autocomplete="off">
+      <div class="grid2">
+        <div class="field">
+          <label>ID</label>
+          <input id="f-id" readonly>
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <select id="f-type">
+            <option value="http">HTTP</option>
+            <option value="grpc">gRPC</option>
+          </select>
+        </div>
+      </div>
+
+      <h3>Request</h3>
+      <div class="grid2">
+        <div class="field" id="f-method-field">
+          <label>Method</label>
+          <select id="f-method">
+            <option value="">ANY</option>
+            <option>GET</option><option>POST</option><option>PUT</option>
+            <option>PATCH</option><option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Path match</label>
+          <select id="f-pathmode">
+            <option value="path">exact</option>
+            <option value="pathPattern">regex</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label id="f-path-label">Path</label>
+        <input id="f-path" list="grpc-methods" placeholder="/orders or ^/orders/[0-9]+$">
+        <datalist id="grpc-methods"></datalist>
+      </div>
+
+      <div class="field">
+        <label>Query (subset)</label>
+        <div id="f-query" class="kvlist"></div>
+        <button type="button" class="ghost small" data-add="f-query">+ query</button>
+      </div>
+
+      <div class="field">
+        <label>Headers (subset)</label>
+        <div id="f-headers" class="kvlist"></div>
+        <button type="button" class="ghost small" data-add="f-headers">+ header</button>
+      </div>
+
+      <div class="field">
+        <label>Request body</label>
+        <select id="f-bodymode">
+          <option value="none">ignore</option>
+          <option value="contains">contains</option>
+          <option value="equal">equals (raw text)</option>
+          <option value="equalJson">equals (JSON)</option>
+        </select>
+      </div>
+      <div class="field" id="f-body-wrap">
+        <textarea id="f-body" spellcheck="false" placeholder="request body to match"></textarea>
+        <button type="button" class="ghost small" id="format-request">format JSON</button>
+      </div>
+
+      <h3>Response</h3>
+      <div class="field" id="f-status-field">
+        <label>Status</label>
+        <select id="f-status-select">
+          <optgroup label="1xx informational">
+            <option value="100">100 Continue</option>
+            <option value="101">101 Switching Protocols</option>
+          </optgroup>
+          <optgroup label="2xx success">
+            <option value="200" selected>200 OK</option>
+            <option value="201">201 Created</option>
+            <option value="202">202 Accepted</option>
+            <option value="204">204 No Content</option>
+            <option value="206">206 Partial Content</option>
+          </optgroup>
+          <optgroup label="3xx redirection">
+            <option value="301">301 Moved Permanently</option>
+            <option value="302">302 Found</option>
+            <option value="304">304 Not Modified</option>
+            <option value="307">307 Temporary Redirect</option>
+          </optgroup>
+          <optgroup label="4xx client error">
+            <option value="400">400 Bad Request</option>
+            <option value="401">401 Unauthorized</option>
+            <option value="403">403 Forbidden</option>
+            <option value="404">404 Not Found</option>
+            <option value="405">405 Method Not Allowed</option>
+            <option value="408">408 Request Timeout</option>
+            <option value="409">409 Conflict</option>
+            <option value="418">418 I am a teapot</option>
+            <option value="422">422 Unprocessable Entity</option>
+            <option value="429">429 Too Many Requests</option>
+          </optgroup>
+          <optgroup label="5xx server error">
+            <option value="500">500 Internal Server Error</option>
+            <option value="501">501 Not Implemented</option>
+            <option value="502">502 Bad Gateway</option>
+            <option value="503">503 Service Unavailable</option>
+            <option value="504">504 Gateway Timeout</option>
+          </optgroup>
+          <option value="custom">custom code...</option>
+        </select>
+        <input id="f-status" type="number" min="100" max="599" value="200" class="hidden">
+      </div>
+
+      <div id="f-grpc-block">
+        <div class="field">
+          <label>gRPC status</label>
+          <select id="f-grpc-status">
+            <option value="0">0 OK</option>
+            <option value="1">1 CANCELLED</option>
+            <option value="2">2 UNKNOWN</option>
+            <option value="3">3 INVALID_ARGUMENT</option>
+            <option value="4">4 DEADLINE_EXCEEDED</option>
+            <option value="5">5 NOT_FOUND</option>
+            <option value="6">6 ALREADY_EXISTS</option>
+            <option value="7">7 PERMISSION_DENIED</option>
+            <option value="8">8 RESOURCE_EXHAUSTED</option>
+            <option value="9">9 FAILED_PRECONDITION</option>
+            <option value="10">10 ABORTED</option>
+            <option value="11">11 OUT_OF_RANGE</option>
+            <option value="12">12 UNIMPLEMENTED</option>
+            <option value="13">13 INTERNAL</option>
+            <option value="14">14 UNAVAILABLE</option>
+            <option value="15">15 DATA_LOSS</option>
+            <option value="16">16 UNAUTHENTICATED</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>gRPC message</label>
+          <input id="f-grpc-message" placeholder="returned with a non-OK status">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Headers</label>
+        <div id="f-resp-headers" class="kvlist"></div>
+        <button type="button" class="ghost small" data-add="f-resp-headers">+ header</button>
+      </div>
+
+      <div class="field">
+        <label>Body</label>
+        <select id="f-respmode">
+          <option value="json">JSON</option>
+          <option value="text">text</option>
+          <option value="none">empty</option>
+        </select>
+      </div>
+      <div class="field" id="f-resp-wrap">
+        <textarea id="f-resp" spellcheck="false" placeholder="{ &quot;hello&quot;: &quot;jomock&quot; }"></textarea>
+        <button type="button" class="ghost small" id="format-response">format JSON</button>
+      </div>
+
+      <div class="field">
+        <label>Delay (ms)</label>
+        <input id="f-delay" type="number" min="0" value="0">
+      </div>
+
+      <div class="row">
+        <button id="save-stub" type="submit">Save stub</button>
+        <button type="button" id="cancel-stub" class="ghost">Cancel</button>
+        <span id="editor-msg" class="muted"></span>
+      </div>
+    </form>
+
+    <div class="panel-head">
+      <h2>Protos</h2>
+      <div class="row tight">
+        <span id="proto-summary" class="muted"></span>
+        <button type="button" id="proto-warn-toggle" class="ghost small hidden">hide warnings</button>
+      </div>
+    </div>
+    <p class="hint">
+      To mock gRPC, import <code>.proto</code> sources here — no protoc, no descriptor file.
+      Pick your <code>proto/</code> folder (so imports like <code>plugins/</code> come along),
+      or individual files. Import once: the sources are cached to
+      <code>protos.json</code> and recompiled on the next start.
+    </p>
+    <div class="row">
+      <button type="button" id="proto-dir" class="ghost">Import .proto folder</button>
+      <button type="button" id="proto-files" class="ghost">Import files</button>
+      <input id="proto-dir-input" type="file" webkitdirectory multiple hidden>
+      <input id="proto-files-input" type="file" accept=".proto" multiple hidden>
+    </div>
+    <div id="proto-warnings" class="warnings"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Journal</h2>
+      <span id="journal-count" class="muted"></span>
+    </div>
+    <table id="journal-table">
+      <thead>
+        <tr><th>Time</th><th>Proto</th><th>Method</th><th>URL</th><th>Status</th><th>Stub</th><th>ms</th><th></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <pre id="entry-detail" class="detail">Click a request row to inspect it.</pre>
+
+    <div class="panel-head"><h2>Verify</h2></div>
+    <div class="row">
+      <input id="verify-id" placeholder="stub id">
+      <input id="verify-count" type="number" min="0" placeholder="expected count (optional)">
+      <button id="verify-run">Verify</button>
+      <span id="verify-msg" class="muted"></span>
+    </div>
+  </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>

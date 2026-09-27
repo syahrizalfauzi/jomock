@@ -1,0 +1,11 @@
+/bin/
+stubs.json
+protos.json
+
+# local build/scratch dirs (used when the go build cache is sandboxed)
+.gocache/
+.gomodcache/
+.gomodcache2/
+.gopath/
+.gotmp/
+.smoke/
