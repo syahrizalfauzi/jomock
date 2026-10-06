@@ -25,7 +25,7 @@ var webFS embed.FS
 
 func main() {
 	mockAddr := flag.String("mock-addr", ":8081", "address for the mock server under test")
-	adminAddr := flag.String("admin-addr", "127.0.0.1:8080", "address for the admin API and UI")
+	adminAddr := flag.String("admin-addr", ":8080", "address for the admin API and UI")
 	stubPath := flag.String("stubs", "stubs.json", "path to the stub file (empty disables persistence)")
 	protoPath := flag.String("proto", "", "protobuf FileDescriptorSet for gRPC mocking (empty disables gRPC)")
 	protosPath := flag.String("protos", "protos.json", "where .proto files imported in the UI are cached (empty disables)")

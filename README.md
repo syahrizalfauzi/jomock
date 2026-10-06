@@ -8,7 +8,7 @@ Single Go binary. No database, no node, no protoc at runtime.
 ## Run
 
 ```sh
-make run                 # mock on :8081, admin API + UI on 127.0.0.1:8080
+make run                 # mock on :8081, admin API + UI on :8080
 go run . -stubs my.json  # custom stub file
 go run . -proto desc.bin # also answer gRPC calls
 ```
@@ -16,7 +16,7 @@ go run . -proto desc.bin # also answer gRPC calls
 Stubs live in `stubs.json` (created on first change, reloaded on start).
 
 - **mock** — `http://localhost:8081` — put this in your app's base URL.
-- **admin + UI** — `http://127.0.0.1:8080` — add, edit, reorder stubs; watch the request journal; run verify.
+- **admin + UI** — `http://localhost:8080` — add, edit, reorder stubs; watch the request journal; run verify.
 
 ## UI
 
@@ -175,7 +175,7 @@ curl -s -X POST localhost:8080/__admin/verify \
 | Flag | Default | Meaning |
 |---|---|---|
 | `-mock-addr` | `:8081` | address the app under test talks to |
-| `-admin-addr` | `127.0.0.1:8080` | admin API + UI (no auth — keep it on loopback) |
+| `-admin-addr` | `:8080` | admin API + UI (no auth — keep it on loopback) |
 | `-stubs` | `stubs.json` | stub file; empty string disables persistence |
 | `-proto` | *(empty)* | protobuf `FileDescriptorSet`; alternative to importing .proto in the UI |
 | `-protos` | `protos.json` | cache of .proto files imported in the UI (empty disables) |

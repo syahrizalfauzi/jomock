@@ -1,0 +1,13 @@
+services:
+  jomock:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - jomock-data:/data
+
+volumes:
+  jomock-data:
